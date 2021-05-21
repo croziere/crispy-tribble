@@ -1,16 +1,25 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: pi
+  name: kuard-deployment
+  labels:
+    app: kuard
 spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kuard
   template:
+    metadata:
+      labels:
+        app: kuard
     spec:
       containers:
-      - name: pi
-        image: perl
-        command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
-      restartPolicy: Never
-  backoffLimit: 4
+        - image: gcr.io/kuar-demo/kuard-amd64:1
+          name: kuard
+          ports:
+            - containerPort: 8080
+              name: http
 ---
 apiVersion: v1
 kind: Service
